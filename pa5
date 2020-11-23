@@ -1,0 +1,46 @@
+Version: 
+	-2012-10-17
+Statement:
+    Sid: SpecificTable
+    Effect: Allow
+    Action: 
+       -dynamodb:PutItem
+    Resource: arn:aws:dynamodb:*:*:cs4740-table   	  			    
+    Sid: PublicRead
+    Effect: Allow
+    Principal: 
+    Action:
+	-s3:GetObject
+	-s3:GetObjectVersion
+    Resource: arn:aws:s3:::cs4740-bucket
+
+
+
+Type: AWS::EC2::SecurityGroup
+Properties:
+     GroupDescription: security group for cloud
+     GroupName: pa5group
+     SecurityGroupEgress:
+	-Egress
+     SecurityGroupIngress:
+	-Ingress --port 80:8080
+	-Ingress --port 128.143.0.0/16
+     Tags: 
+	-Tag
+     VpcId: String
+
+
+Type: AWS::EC2::Instance
+Properties:
+	ImageId: AWS::us-east-1 -ami-0947d2ba12ee1ff75
+	InstanceType: t2.micro
+	UserData:#! /bin/sh
+		yum update -y
+		yum install docker -y
+		service docker start
+		sudo docker pull cs4740/accord-demo
+		sudo docker run -d -p 80:8080 cs4740/accord-demo
+	SecurityGroups: 
+    		- pa5group
+	Volumes:
+		-18GB
